@@ -5,8 +5,10 @@ pub struct Community {
     pub title: String,
     pub description: String,
     pub initializer: Pubkey,
-    pub member_count: u32,
+    pub voter_member_count: u32,
     pub proposer_count: u32,
+    pub proposal_count: u64,
+    pub min_proposal_duration: i64,
     pub collection_nft: Option<Pubkey>
 }
 
@@ -14,32 +16,44 @@ pub struct Community {
 pub struct Proposer {
     pub is_voted: bool,
     pub can_propose: bool,
+    pub proposal_count: u64,
     pub is_initializer: bool
 }
 
-#[account]
-pub struct Proposal {
+#[derive(Debug, PartialEq, Clone, AnchorSerialize, AnchorDeserialize)]
+pub struct BaseProposal {
     pub proposer: Pubkey,
-    pub proposal_type: ProposalType,
-    pub description: String,
     pub status: ProposalStatus,
-    pub vote_option_yes: ProposalOption,
-    pub vote_option_no: ProposalOption,
+    pub approval_count: ProposalOption,
+    pub denial_count: ProposalOption,
     pub init_date: i64,
     pub end_date: i64
 }
 
+#[account]
+pub struct CustomProposal {
+    pub proposal: BaseProposal,
+    pub title: String,
+    pub description: Option<String>,
+}
+
+#[account]
+pub struct ManageMemberProposal {
+    pub proposal: BaseProposal,
+    pub action: ManageActionType,
+    pub voted_account: Pubkey,
+    pub voted_account_owner: Pubkey
+}
+
 #[derive(Debug, PartialEq, Clone, AnchorSerialize, AnchorDeserialize)]
 pub enum ProposalStatus {
-    Initialized,
     Voting,
     Voted,
     Executed
 }
 
 #[derive(Debug, PartialEq, Clone, AnchorSerialize, AnchorDeserialize)]
-pub enum ProposalType {
-    Custom,
+pub enum ManageActionType {
     AddMember,
     AddProposer,
     RemoveMember,
@@ -51,12 +65,6 @@ pub struct ProposalOption {
     pub option: String,
     pub vote_count: u64
 }
-
-// impl ProposalOption {
-//     fn size(&self) -> u32{
-//         return 8 + u32::try_from( self.option.len() ).unwrap();
-//     }
-// }
 
 #[account]
 pub struct Vote {

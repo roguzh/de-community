@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
 use instructions::*;
+use state::*;
 
 pub mod instructions;
 pub mod errors;
@@ -15,11 +16,24 @@ pub mod de_community {
         ctx: Context<InitializeCommunity>,
         title: String,
         description: String,
+        min_proposal_duration: i64,
         nft_collection: Option<Pubkey>
     ) -> Result<()> {
-        instructions::initialize_community(ctx, title, description, nft_collection)
+        instructions::initialize_community(ctx, title, description, min_proposal_duration, nft_collection)
     }
-}
 
-#[derive(Accounts)]
-pub struct Initialize {}
+    pub fn initialize_member(
+        ctx: Context<InitializeMember>
+    ) -> Result<()> {
+        instructions::initialize_member(ctx)
+    }
+
+    pub fn create_manage_member_proposal(
+        ctx: Context<CreateManageMemberProposal>,
+        action_type: ManageActionType,
+        end_date: i64
+    ) -> Result<()> {
+        instructions::create_manage_member_proposal(ctx, action_type, end_date)
+    }
+
+}
