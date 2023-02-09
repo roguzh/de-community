@@ -2,8 +2,8 @@ use anchor_lang::prelude::*;
 use instructions::*;
 use state::*;
 
-pub mod instructions;
 pub mod errors;
+pub mod instructions;
 pub mod state;
 
 declare_id!("AHJ8w9ePSzS7mjhXV4LAqatQtdEk9DpTgTLdzrpHU6P2");
@@ -17,23 +17,30 @@ pub mod de_community {
         title: String,
         description: String,
         min_proposal_duration: i64,
-        nft_collection: Option<Pubkey>
+        nft_collection: Option<Pubkey>,
     ) -> Result<()> {
-        instructions::initialize_community(ctx, title, description, min_proposal_duration, nft_collection)
+        instructions::initialize_community(
+            ctx,
+            title,
+            description,
+            min_proposal_duration,
+            nft_collection,
+        )
     }
 
-    pub fn initialize_member(
-        ctx: Context<InitializeMember>
-    ) -> Result<()> {
+    pub fn initialize_member(ctx: Context<InitializeMember>) -> Result<()> {
         instructions::initialize_member(ctx)
     }
 
-    pub fn create_manage_member_proposal(
-        ctx: Context<CreateManageMemberProposal>,
-        action_type: ManageActionType,
-        end_date: i64
-    ) -> Result<()> {
-        instructions::create_manage_member_proposal(ctx, action_type, end_date)
+    pub fn initialize_proposer(ctx: Context<InitializeProposer>) -> Result<()> {
+        instructions::initialize_proposer(ctx)
     }
 
+    pub fn create_proposal(
+        ctx: Context<CreateProposal>,
+        proposal_type: ProposalType,
+        end_date: i64,
+    ) -> Result<()> {
+        instructions::create_proposal(ctx, proposal_type, end_date)
+    }
 }

@@ -45,8 +45,8 @@ describe("de-community", () => {
       initializerMember: memberAddress,
       initializer: mainKeypair.publicKey,
       systemProgram: anchor.web3.SystemProgram.programId
-    }).signers([ 
-      mainKeypair 
+    }).signers([
+      mainKeypair
     ]).rpc();
 
     console.log(`\tSignature: ${tx}`);
@@ -60,7 +60,7 @@ describe("de-community", () => {
     console.log(member);
   });
 
-  it("Initialize Member Account ", async() => {
+  it("Initialize Member Account ", async () => {
     const communityAddress = findProgramAddressSync([
       mainKeypair.publicKey.toBuffer(),
       Buffer.from(communityTitle)
@@ -73,20 +73,20 @@ describe("de-community", () => {
     ], program.programId)[0];
 
     const tx = await program.methods.initializeMember()
-    .accounts({
-      community: communityAddress,
-      member: memberAddress,
-      memberOwner: memberKeypair.publicKey,
-      payer: mainKeypair.publicKey
-    }).signers([
-      mainKeypair
-    ]).rpc();
+      .accounts({
+        community: communityAddress,
+        member: memberAddress,
+        memberOwner: memberKeypair.publicKey,
+        payer: mainKeypair.publicKey
+      }).signers([
+        mainKeypair
+      ]).rpc();
 
     const member = await program.account["member"].fetch(memberAddress);
     console.log(member);
   });
 
-  it("Creating Manage Member Proposal: Add Member", async() => {
+  it("Creating Proposal", async () => {
     const communityAddress = findProgramAddressSync([
       mainKeypair.publicKey.toBuffer(),
       Buffer.from(communityTitle)
@@ -100,7 +100,6 @@ describe("de-community", () => {
     let proposer = await program.account["proposer"].fetch(proposerAddress);
 
     const proposalAddress = findProgramAddressSync([
-      communityAddress.toBuffer(),
       proposerAddress.toBuffer(),
       proposer.proposalCount.toBuffer('be', 8)
     ], program.programId)[0];
@@ -111,37 +110,43 @@ describe("de-community", () => {
       memberKeypair.publicKey.toBuffer(),
     ], program.programId)[0];
 
-    const tx = await program.methods.createManageMemberProposal(
-      { "addMember": {
-
-      } },
-      new anchor.BN(1675895001)
+    const tx = await program.methods.createProposal(
+      {
+        "manageMember": {
+          "action": { "addMember": {} },
+          "voted_account": memberAddress,
+          "voted_account_owner": memberKeypair.publicKey
+        }
+      },
+      new anchor.BN(1685895001)
     ).accounts({
       proposal: proposalAddress,
       proposer: proposerAddress,
       community: communityAddress,
-      managedMember: memberAddress,
-      managedMemberOwner: memberKeypair.publicKey,
-      signer: mainKeypair.publicKey
+      signer: mainKeypair.publicKey,
+      systemProgram: anchor.web3.SystemProgram.programId
     }).signers([
       mainKeypair
-    ]).rpc();
+    ]).rpc({
+      "commitment": "confirmed"
+    });
+    await anchor.getProvider().connection.confirmTransaction(tx);
 
     const community = await program.account["community"].fetch(communityAddress);
     proposer = await program.account["proposer"].fetch(proposerAddress);
     const member = await program.account["member"].fetch(memberAddress);
-    const proposal = await program.account["manageMemberProposal"].fetch(proposalAddress);
+    const proposal = await program.account["proposal"].fetch(proposalAddress);
 
-    console.log("Community");
-    console.log(community);
-    console.log("\nProposer");
-    console.log(proposer);
-    console.log("\nMember");
-    console.log(member);
-    console.log("\nProposal");
-    console.log(proposal);
-
-
+    // console.log("Community");
+    // console.log(community);
+    // console.log("\nProposer");
+    // console.log(proposer);
+    // console.log("\nMember");
+    // console.log(member);
+    // console.log("\nProposal");
+    // console.log(proposal);
+    console.log("\nProposal Type");
+    console.log(proposal.proposalType);
   });
 
 });

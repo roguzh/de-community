@@ -18,7 +18,7 @@ pub struct InitializeCommunity<'info> {
         seeds = [ b"proposer", community.key().as_ref(), initializer.key().as_ref() ],
         bump,
         payer = initializer,
-        space = 8 + 1 + 1 + 8 + 1
+        space = 8 + 1 + 1 + 8 + 32
     )]
     pub initializer_proposer: Account<'info, Proposer>,
     #[account[
@@ -59,7 +59,7 @@ pub fn initialize_community(
     proposer.is_voted = false;
     proposer.can_propose = true;
     proposer.proposal_count = 0;
-    proposer.is_initializer = true;
+    proposer.owner = ctx.accounts.initializer.key();
     msg!("Initializer is set as a proposer!");
 
     member.can_vote = true;

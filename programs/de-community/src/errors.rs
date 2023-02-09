@@ -4,4 +4,13 @@ use anchor_lang::prelude::*;
 pub enum CustomErrorCode {
     #[msg("End date is too short")]
     EndDateTooShort,
+
+    #[msg("Member is not authorized")]
+    UnauthorizedMember,
+
+    #[msg("Proposer is not authorized")]
+    UnauthorizedProposer,
+
+    #[msg("Invalid Proposal")]
+    InvalidProposal,
 }
