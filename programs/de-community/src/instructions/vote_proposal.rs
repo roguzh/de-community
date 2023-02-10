@@ -1,11 +1,15 @@
 use anchor_lang::{prelude::*};
-use crate::{state::{Member, Community, Proposer, Vote, Proposal, ProposalStatus, ProposalType}, errors::CustomErrorCode};
+use crate::{state::{Member, Community, Vote, Proposal, ProposalStatus, ProposalType}, errors::CustomErrorCode};
 
 #[derive(Accounts)]
 pub struct VoteProposal<'info> {
     #[account(
         mut,
-        constraint = (proposal.status == ProposalStatus::Voting && proposal.proposer.key() != voter.key())
+        constraint = ( 
+            proposal.status == ProposalStatus::Voting && 
+            proposal.proposer.key() != voter.key() &&
+            proposal.end_date >= Clock::get().unwrap().unix_timestamp
+        )
     )]
     pub proposal: Account<'info, Proposal>,
     #[account(mut)]
