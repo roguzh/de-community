@@ -68,11 +68,11 @@ pub fn create_proposal(
 
     proposal.proposer = proposer.key();
     proposal.status = ProposalStatus::Voting;
-    proposal.approval_count = ProposalOption {
+    proposal.approval_option = ProposalOption {
         option: APPROVAL_TEXT.to_owned(),
         vote_count: 0,
     };
-    proposal.denial_count = ProposalOption {
+    proposal.denial_option = ProposalOption {
         option: DENIAL_TEXT.to_owned(),
         vote_count: 0,
     };
@@ -87,6 +87,12 @@ pub fn create_proposal(
             }
         },
         ProposalType::ManageMember { action, voted_account: _, voted_account_owner: _ } => {
+            require!( ctx.accounts.voted_member.as_ref().unwrap().can_vote, CustomErrorCode::InvalidMember);
+            require!( 
+                ctx.accounts.voted_member_owner.as_ref().unwrap().key() != ctx.accounts.signer.key(), 
+                CustomErrorCode::InvalidMember
+            );
+
             proposal.proposal_type = ProposalType::ManageMember { 
                 action, 
                 voted_account: ctx.accounts.voted_member.as_ref().unwrap().key(), 
