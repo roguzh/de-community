@@ -43,4 +43,11 @@ pub mod de_community {
     ) -> Result<()> {
         instructions::create_proposal(ctx, proposal_type, end_date)
     }
+
+    pub fn vote_proposal(
+        ctx: Context<VoteProposal>,
+        vote: bool
+    ) -> Result<()> {
+        instructions::vote_proposal(ctx, vote)
+    }
 }
