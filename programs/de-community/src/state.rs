@@ -26,8 +26,8 @@ pub struct Proposer {
 pub struct Proposal {
     pub proposer: Pubkey,
     pub status: ProposalStatus,
-    pub approval_count: ProposalOption,
-    pub denial_count: ProposalOption,
+    pub approval_option: ProposalOption,
+    pub denial_option: ProposalOption,
     pub init_date: i64,
     pub end_date: i64,
     pub proposal_type: ProposalType,
@@ -81,7 +81,7 @@ impl ProposalType {
 pub enum ProposalStatus {
     Voting,
     Voted,
-    Executed,
+    Finalized,
 }
 
 #[derive(Debug, PartialEq, Clone, AnchorSerialize, AnchorDeserialize)]
@@ -100,7 +100,14 @@ pub struct ProposalOption {
 
 #[account]
 pub struct Vote {
-    pub is_voted: bool,
+    pub vote: bool,
+    pub is_initialized: bool,
+}
+
+impl Vote {
+    pub fn get_size() -> usize {
+        return 1 + 1;
+    }
 }
 
 #[account]
